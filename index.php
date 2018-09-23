@@ -1,4 +1,8 @@
 <?php
+// error_reporting(E_ALL^E_WARNING^E_NOTICE);
+error_reporting(E_ALL);
+ini_set("display_errors", 1);
+
 session_start();
 // if session set go to dashboard
 if ( isset($_SESSION['u']) && !empty($_SESSION['u']) ) {

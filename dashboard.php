@@ -1,4 +1,8 @@
 <?php
+// error_reporting(E_ALL^E_WARNING^E_NOTICE);
+error_reporting(E_ALL);
+ini_set("display_errors", 1);
+
 session_start();
 if ( !isset($_SESSION['u']) || empty($_SESSION['u']) ) {
   header('Location: index.php');
@@ -60,18 +64,16 @@ if ( !isset($_SESSION['u']) || empty($_SESSION['u']) ) {
         <div class="container">
 
           <div class="row">
-            <div class="col-md-6">
-              <h1>Your spatial maps</h1>
-              
+            <div class="col">
+              <h1>What people are doing</h1>
             </div>
-
             <div class="col-md-6">
               <div class="row">
                 <div class="col">
                   <h3>Add a new set of spatial maps</h3>
                   <p class="text-muted">You can upload a Nifti file below.</p>
                   <p>
-                    <form class="" action="upload_map.php" method="POST">
+                    <form class="" enctype="multipart/form-data" action="upload_map.php" method="POST">
                       <div class="form-group">
                         <div class="custom-file">
                           <input type="file" class="custom-file-input" id="customFile" name="nifti_file">
@@ -87,9 +89,11 @@ if ( !isset($_SESSION['u']) || empty($_SESSION['u']) ) {
               </div>
 
               <div class="row">
-                <div class="col">
-                  <h3>What people are doing</h3>
+                <div class="col-md-6">
+                  <h3>Your spatial maps</h3>
+                  
                 </div>
+
               </div>
               
             </div>
