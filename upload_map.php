@@ -48,6 +48,7 @@ else {
     <!-- Bootstrap CSS -->
     <link rel="stylesheet" href="css/bootstrap.min.css">
     <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.3.1/css/all.css" integrity="sha384-mzrmE5qonljUremFsqc01SB46JvROS7bZs3IO2EmfFsd15uHvIt+Y8vEf7N7fWAU" crossorigin="anonymous">
+    <link rel="stylesheet" href="css/main.css">
 
     <title>A Crowdsourced Spatial Map Labeller</title>
   </head>
@@ -58,7 +59,8 @@ else {
           <div class="row">
             <div class="col-sm-8 col-md-7 py-4">
               <h4 class="text-white">About</h4>
-              <p class="text-muted">Add some information about the album below, the author, or any other background context. Make it a few sentences long so folks can pick up some informative tidbits. Then, link them off to some social networking sites or contact information.</p>
+              <p class="text-muted">This is a quick and dirty demo of a crowdsourced IC labeller. Anyone can upload a NIFTI image of activation. Others can see 
+                the uploaded images and vote on those as networks/artifacts.</p>
             </div>
             <div class="col-sm-4 offset-md-1 py-4">
               <!-- greet -->
@@ -132,7 +134,7 @@ else {
 
     <!-- Optional JavaScript -->
     <!-- jQuery first, then Popper.js, then Bootstrap JS -->
-    <script src="js/jquery-3.3.1.slim.min.js"></script>
+    <script src="js/jquery-3.3.1.min.js"></script>
     <script src="js/popper.min.js"></script>
     <script src="js/bootstrap.min.js"></script>
   </body>

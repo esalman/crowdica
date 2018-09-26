@@ -18,10 +18,11 @@ try {
 }
 
 # get the image
+$image_id = $_GET['id'];
 $error = '';
 try {
   $stmt = $db->prepare("SELECT user_id, file FROM images WHERE image_id = ?");
-  $stmt->execute([$_GET['id']]);
+  $stmt->execute([$image_id]);
   $row = $stmt->fetch();
   if ( !$row ) throw new Exception("Invalid image!", 1);
 }
@@ -46,6 +47,7 @@ catch (Exception $e) {
     <!-- Bootstrap CSS -->
     <link rel="stylesheet" href="css/bootstrap.min.css">
     <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.3.1/css/all.css" integrity="sha384-mzrmE5qonljUremFsqc01SB46JvROS7bZs3IO2EmfFsd15uHvIt+Y8vEf7N7fWAU" crossorigin="anonymous">
+    <link rel="stylesheet" href="css/main.css">
     <link rel="stylesheet" type="text/css" href="css/papaya.css" />
 
     <title>A Crowdsourced Spatial Map Labeller</title>
@@ -57,7 +59,8 @@ catch (Exception $e) {
           <div class="row">
             <div class="col-sm-8 col-md-7 py-4">
               <h4 class="text-white">About</h4>
-              <p class="text-muted">Add some information about the album below, the author, or any other background context. Make it a few sentences long so folks can pick up some informative tidbits. Then, link them off to some social networking sites or contact information.</p>
+              <p class="text-muted">This is a quick and dirty demo of a crowdsourced IC labeller. Anyone can upload a NIFTI image of activation. Others can see 
+                the uploaded images and vote on those as networks/artifacts.</p>
             </div>
             <div class="col-sm-4 offset-md-1 py-4">
               <!-- greet -->
@@ -103,6 +106,62 @@ catch (Exception $e) {
               <div class="col-6">
                 <div class="papaya" data-params="params"></div>
               </div>
+              <div class="col-6">
+                <form id="decisionForm">
+                  <div class="form-group">
+                    <h4><label for="">Is it a network or an artifact?</label></h4>
+                    <div class="btn-group btn-group-toggle" data-toggle="buttons">
+                      <label class="btn btn-outline-success btn-lg active">
+                        <input type="radio" name="label_1" id="artifact" autocomplete="off"> Artifact
+                      </label>
+                      <label class="btn btn-outline-success btn-lg">
+                        <input type="radio" name="label_1" id="network" autocomplete="off"> Network
+                      </label>
+                      <label class="btn btn-outline-success btn-lg">
+                        <input type="radio" name="label_1" id="unsure" autocomplete="off"> Unsure
+                      </label>
+                    </div>
+                  </div>
+
+                  <div class="form-group">
+                    <label for="decisionComment">You can also add a comment.</label>
+                    <textarea class="form-control" id="decisionComment" rows="3"></textarea>
+                  </div>
+                  <button type="submit" class="btn btn-primary">Submit</button>
+                </form>
+
+                <div class="modal fade" id="decisionModal" role="dialog" aria-labelledby="decisionModalLabel" aria-hidden="true">
+                  <div class="modal-dialog" role="document">
+                    <div class="modal-content">
+                      <div class="modal-header">
+                        <h5 class="modal-title" id="decisionModalLabel">Message</h5>
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                          <span aria-hidden="true">&times;</span>
+                        </button>
+                      </div>
+                      <div class="modal-body">
+                        
+                      </div>
+                      <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                <hr />
+                <h4>Here are some information to help you make a decision:</h4>
+                <p class="decisionHelp">
+                  <button type="button" class="btn btn-sm btn-primary">Overlap with white matter <span class="badge badge-light">99%</span></button>
+                  <button type="button" class="btn btn-sm btn-info">Overlap with CSF <span class="badge badge-light">99%</span></button>
+                  <button type="button" class="btn btn-sm btn-warning">Overlap with edge mask <span class="badge badge-light">99%</span></button>
+                  <button type="button" class="btn btn-sm btn-success">Top 3 Neurosynth labels <span class="badge badge-light">task</span> <span class="badge badge-light">frontal</span> <span class="badge badge-light">temporal</span></button>
+                  </p>
+
+                <hr />
+                <h4>What others are saying?</h4>
+                <img src="images/vector-windrose-diagram-blank-template-weather-infographics-illustration-75200845.jpg" width="100%" />
+              </div>
             </div>
             <?php
           }
@@ -124,14 +183,50 @@ catch (Exception $e) {
 
     <!-- Optional JavaScript -->
     <!-- jQuery first, then Popper.js, then Bootstrap JS -->
-    <script src="js/jquery-3.3.1.slim.min.js"></script>
+    <script src="js/jquery-3.3.1.min.js"></script>
     <script src="js/popper.min.js"></script>
     <script src="js/bootstrap.min.js"></script>
     <script type="text/javascript" src="js/papaya.js"></script>
 
     <script type="text/javascript">
-      var params = [];
-      params["images"] = ["uploads/<?php echo $row['file'] ?>"];
+      var params = []
+      params['images'] = ['data/ch2better_aligned2EPI_resampled.nii', ['uploads/<?php echo $row['file'] ?>']]
+      params['worldSpace'] = true
+      params['showControlBar'] = true
+
+      $(document).ready( function () {
+        $('#decisionForm').submit( function (e) {
+          e.preventDefault()
+
+          t = papayaContainers[0].viewer.currentScreenVolume.currentTimepoint
+          $.ajax({
+            url: "save_decision.php",
+            data: {
+                id: <?php echo $image_id ?>,
+                volume: t,
+                label_1: $('input[name=label_1]:checked').attr('id'),
+                comment: $('#decisionComment').val()
+            },
+            type: "POST",
+            dataType : "json"
+          })
+          .done(function( xhr ) {
+            console.log( xhr )
+
+            s = xhr.error ? '<p class="text-danger">' + xhr.error + '</p>' : '<p class="text-success">Your decision was saved, thanks!</p>'
+            $('#decisionModal .modal-body').html(s)
+            $('#decisionModal').modal('show')
+          })
+          .fail(function( xhr, status, errorThrown ) {
+            console.log( "Error: " + errorThrown );
+            console.log( "Status: " + status );
+            console.dir( xhr );
+            $('#decisionModal .modal-body').html(xhr.error)
+            $('#decisionModal').modal('show')
+          })
+
+        } )
+      } )
     </script>
 
   </body>
