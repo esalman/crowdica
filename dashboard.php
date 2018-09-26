@@ -110,7 +110,7 @@ catch (Exception $e) {
                     <i class="fas fa-lg fa-brain" style="margin: 5px;"></i>
                     <div class="media-body">
                       <h5 class="mt-0 mb-1"><span class="text-warning"><?php echo explode('@', $value['user_id'])[0] ?></span> voted 
-                        <span class="text-warning"><?php echo $value['file'].','.$value['volume'] ?></span> as <?php echo $value['label_1'] ?></h5>
+                        <a class="text-warning" href="image.php?id=<?php echo $value['image_id'] ?>"><?php echo $value['file'].','.$value['volume'] ?></a> as <?php echo $value['label_1'] ?></h5>
                         <?php echo $value['comment'] ? $value['comment'] : '' ?>
                     </div>
                   </li>
